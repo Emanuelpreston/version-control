@@ -1,0 +1,50 @@
+<?php
+session_start();
+include 'sidebar.php';
+
+$tasks = $_SESSION['tasks'] ?? [];
+
+// Filter by category if ?cat= is present
+if (isset($_GET['cat'])) {
+    $filter_cat = $_GET['cat'];
+    $tasks = array_filter($tasks, function ($task) use ($filter_cat) {
+        return $task['category'] === $filter_cat;
+    });
+}
+?>
+
+<div class="content">
+    <h2>📋 Task List</h2>
+    <?php if (empty($tasks)): ?>
+        <p>No tasks found.</p>
+    <?php else: ?>
+        <table>
+            <thead>
+                <tr>
+                    <th>Task Description</th>
+                    <th>Category</th>
+                    <th>Due Date</th>
+                    <th>Priority</th>
+                    <th>Completed</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($tasks as $index => $task): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($task['task']); ?></td>
+                    <td><?php echo htmlspecialchars($task['category']); ?></td>
+                    <td><?php echo htmlspecialchars($task['due_date']); ?></td>
+                    <td><?php echo htmlspecialchars($task['priority']); ?></td>
+                    <td>
+                        <?php if ($task['completed']): ?>
+                            ✅
+                        <?php else: ?>
+                            <a href="index.php?complete=<?php echo $index; ?>" style="color:green;">Mark Complete</a>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php endif; ?>
+</div>
