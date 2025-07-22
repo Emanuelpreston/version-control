@@ -1,0 +1,82 @@
+<?php
+// Task.php — OOP class implementation
+
+class Task {
+    private $id;
+    private $title;
+    private $description;
+    private $due_date;
+    private $category;
+    private $priority;
+
+    public function __construct($title, $description, $due_date, $category, $priority) {
+        $this->title = $title;
+        $this->description = $description;
+        $this->due_date = $due_date;
+        $this->category = $category;
+        $this->priority = $priority;
+    }
+
+    // Encapsulation: getters & setters
+    public function getTitle() {
+        return $this->title;
+    }
+
+    public function setTitle($title) {
+        $this->title = $title;
+    }
+
+    public function getDescription() {
+        return $this->description;
+    }
+
+    public function setDescription($description) {
+        $this->description = $description;
+    }
+
+    public function getDueDate() {
+        return $this->due_date;
+    }
+
+    public function setDueDate($due_date) {
+        $this->due_date = $due_date;
+    }
+
+    public function getCategory() {
+        return $this->category;
+    }
+
+    public function setCategory($category) {
+        $this->category = $category;
+    }
+
+    public function getPriority() {
+        return $this->priority;
+    }
+
+    public function setPriority($priority) {
+        $this->priority = $priority;
+    }
+
+    // Abstraction: hide DB logic
+    public function save($conn) {
+        $stmt = $conn->prepare("INSERT INTO tasks (title, description, due_date, category, priority) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssss", $this->title, $this->description, $this->due_date, $this->category, $this->priority);
+        return $stmt->execute();
+    }
+}
+
+// Inheritance & Polymorphism example:
+class WorkTask extends Task {
+    public function getCategory() {
+        return "Work: " . parent::getCategory();
+    }
+}
+
+class SchoolTask extends Task {
+    public function getCategory() {
+        return "School: " . parent::getCategory();
+    }
+}
+
+?>
