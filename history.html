@@ -1,0 +1,37 @@
+<?php
+require_once 'db.php';
+
+$user_id = $_SESSION['user_id'] ?? 0;
+
+$completed_tasks = [];
+
+if ($user_id) {
+    $stmt = $mysqli->prepare("SELECT task, category, due_date, priority, completed_at FROM tasks WHERE user_id = ? AND completed = 1 AND completed_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) ORDER BY completed_at DESC");
+    $stmt->bind_param('i', $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    while ($row = $result->fetch_assoc()) {
+        $completed_tasks[] = $row;
+    }
+    $stmt->close();
+}
+?>
+
+<div class="content">
+    <h2> Completed Tasks - Past 7 Days</h2>
+    <?php if (empty($completed_tasks)): ?>
+        <p>No completed tasks in the past 7 days.</p>
+    <?php else: ?>
+        <div class="glassbox">
+            <?php foreach ($completed_tasks as $task): ?>
+                <div class="task-box" style="margin-bottom: 15px; cursor: default;">
+                    <p><strong>Task Description:</strong> <?php echo htmlspecialchars($task['task']); ?></p>
+                    <p><strong>Category:</strong> <?php echo htmlspecialchars($task['category']); ?></p>
+                    <p><strong>Due Date:</strong> <?php echo htmlspecialchars($task['due_date']); ?></p>
+                    <p><strong>Priority:</strong> <?php echo htmlspecialchars($task['priority']); ?></p>
+                    <p><strong>Completed At:</strong> <?php echo htmlspecialchars($task['completed_at']); ?></p>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+</div>
